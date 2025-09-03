@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Clave</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #111;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .intro {
+      background-color: white;
+      color: black;
+      padding: 20px;
+      margin-bottom: 30px;
+      border-radius: 10px;
+      width: 600px;
+      text-align: center;
+      box-shadow: 0 0 10px #000;
+    }
+
+    .container {
+      background-color: #444;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #000;
+    }
+
+    .lcd {
+      background-color: #0033aa;
+      border: 3px solid #fff;
+      padding: 20px;
+      width: 320px;
+      height: 110px;
+      font-size: 20px;
+      line-height: 1.5;
+      text-align: center;
+      margin-bottom: 25px;
+      font-family: 'Digital-7', 'Courier New', monospace;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(4, 70px);
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .keypad button {
+      font-size: 22px;
+      padding: 12px;
+      cursor: pointer;
+      border-radius: 6px;
+      border: 2px solid white;
+    }
+
+    .keypad button.num {
+      background-color: #5a90c2;
+      color: white;
+    }
+
+    .keypad button.num:hover {
+      background-color: #8ab5e0;
+      color: #0033aa;
+    }
+
+    .keypad button.func {
+      background-color: #e06666;
+      color: white;
+    }
+
+    .keypad button.func:hover {
+      background-color: #f4cccc;
+      color: #990000;
+    }
+
+    .credit {
+      margin-top: 25px;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .credit a {
+      color: #a3cfff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .credit a:hover {
+      text-decoration: underline;
+    }
+
+    @font-face {
+      font-family: 'Digital-7';
+      src: url('https://fonts.cdnfonts.com/s/15353/Digital7-rg1.ttf') format('truetype');
+    }
+  </style>
+</head>
+<body>
+  <div class="intro">
+    El emblema más antiguo, origen de todo. Su auténtico valor se revela sólo a quienes conocen la fecha en que comenzó la historia.
+  </div>
+
+  <div class="container">
+    <div class="lcd" id="lcd">
+      Introduce la clave:<br>
+      [_ _ _ _]<br>
+      Confirma con #
+    </div>
+
+    <div class="keypad">
+      <button class="num" onclick="pressKey('1')">1</button>
+      <button class="num" onclick="pressKey('2')">2</button>
+      <button class="num" onclick="pressKey('3')">3</button>
+      <button class="func" onclick="pressKey('A')">A</button>
+
+      <button class="num" onclick="pressKey('4')">4</button>
+      <button class="num" onclick="pressKey('5')">5</button>
+      <button class="num" onclick="pressKey('6')">6</button>
+      <button class="func" onclick="pressKey('B')">B</button>
+
+      <button class="num" onclick="pressKey('7')">7</button>
+      <button class="num" onclick="pressKey('8')">8</button>
+      <button class="num" onclick="pressKey('9')">9</button>
+      <button class="func" onclick="pressKey('C')">C</button>
+
+      <button class="func" onclick="pressKey('*')">*</button>
+      <button class="num" onclick="pressKey('0')">0</button>
+      <button class="num" onclick="pressKey('#')">#</button>
+      <button class="func" onclick="pressKey('D')">D</button>
+    </div>
+
+    <div class="credit">
+      by <a href="https://www.instagram.com/tomascastellanosx" target="_blank">@tomascastellanosx</a>
+    </div>
+  </div>
+
+  <audio id="buzzer" src="https://freesound.org/data/previews/341/341695_5260877-lq.mp3"></audio>
+
+  <script>
+    const lcd = document.getElementById('lcd');
+    const buzzer = document.getElementById('buzzer');
+    let input = [];
+
+    function pressKey(key) {
+      buzzer.currentTime = 0;
+      buzzer.play();
+
+      if (key === '#') {
+        if (input.length === 4) {
+          const code = input.join('');
+          if (code === '0906') {
+            lcd.innerHTML = '✅ Clave correcta<br>Acceso concedido';
+          } else {
+            showError();
+          }
+        }
+      } else if (input.length < 4 && /^[0-9A-D]$/.test(key)) {
+        input.push(key);
+        updateDisplay();
+      }
+    }
+
+    function updateDisplay() {
+      let display = input.map(n => n).join(' ');
+      while (input.length < 4) {
+        display += ' _';
+        input.push('_');
+      }
+      lcd.innerHTML = `Introduce la clave:<br>[${input.map(c => c === '_' ? '_' : c).join(' ')}]<br>Confirma con #`;
+      input = input.filter(c => c !== '_');
+    }
+
+    function showError() {
+      lcd.innerHTML = '❌ ¡Clave incorrecta!';
+      setTimeout(() => {
+        input = [];
+        lcd.innerHTML = 'Introduce la clave:<br>[_ _ _ _]<br>Confirma con #';
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
